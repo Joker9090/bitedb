@@ -1,0 +1,33 @@
+{
+  "name": "bitedb",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "find ./test -name '*_test.js' | xargs mocha -R spec",
+    "build": "rimraf dist/ && babel ./ --out-dir dist/ --ignore ./node_modules,./.babelrc,./package.json,./npm-debug.log --copy-files",
+    "start": "npm run build && node dist/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Joker9090/bitedb.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Joker9090/bitedb/issues"
+  },
+  "homepage": "https://github.com/Joker9090/bitedb#readme",
+  "dependencies": {
+    "express": "^4.16.1",
+    "json-validation": "^1.0.4",
+    "morgan": "^1.9.0"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-preset-es2015": "^6.24.1",
+    "chai": "^4.1.2",
+    "mocha": "^3.5.3",
+    "rimraf": "^2.6.2"
+  }
+}
