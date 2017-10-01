@@ -1,6 +1,7 @@
 var fs = require('fs');
 var jv = new require('json-validation');
 jv = new jv.JSONValidation();
+
 var bitedb = function(){
   this.dbLocation;
   this.db;
@@ -54,11 +55,13 @@ var bitedb = function(){
   }
   this.filter = (all, condition) => {
     function checkCondition(items,key,particularCondition) {
+      items = (items.constructor !== Array) ? [items] : items;
       return items.filter((item) => {
          if (item[key] == particularCondition) return item;
       })
     }
     function checkFunctionondition(items,functionCondition) {
+      items = (items.constructor !== Array) ? [items] : items;
       return items.filter((item) => {
         if (functionCondition(item)) return item;
       })
@@ -73,17 +76,29 @@ var bitedb = function(){
     }
     return all;
   }
+  this.update = (tableObject,filter,objectChanges,fn) => {
+    this.read(tableObject, (data) => {
+      var objs = data.map((item) => {
+        var filteredItem = this.filter(item,filter);
+        return (filteredItem.length > 0) ? Object.assign({}, item, objectChanges) : item;
+      });
+      this.write(tableObject,objs,fn);
+    });
+  }
+  this.add = (tableObject,items,fn) => {
+    this.read(tableObject, (data) => {
+      items = (items.constructor !== Array) ? [items] : items;
+      items.map((item) => { data.push(item); });
+      this.write(tableObject,data,fn);
+    });
+  }
+  this.remove = (tableObject,items,fn) => {
+    this.read(tableObject, (data) => {
+      items = (items.constructor !== Array) ? [items] : items;
+      data.filter((item) => { return (!items.indexOf(item) > -1 ) });
+      this.write(tableObject,data,fn);
+    });
+  }
 }
 
 module.exports = bitedb;
-
-/*
-DB TODO:
-
-Update filtrando
-add uno solo
-
-select id if have
-Export
-
-*/

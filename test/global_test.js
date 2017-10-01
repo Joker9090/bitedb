@@ -68,4 +68,68 @@ describe('BiteDB', function() {
     });
   });
 
+  it('should add 1 User in Users', (done) => {
+    db.write("users",users, () => {
+      var user2add = { id: 4, name: "Rogelio" }
+      db.add("users",user2add,() => {
+        db.read("users",(data) => {
+          var expectedResult = users.concat(user2add);
+          expect(data).to.eql(expectedResult);
+          done();
+        })
+      });
+    });
+  });
+
+  it('should add more than one User in Users', (done) => {
+    db.write("users",users, () => {
+      var users2add = [{ id: 5, name: "Carlos" }, { id: 6, name: "Ruben Rada" }]
+      db.add("users",users2add,() => {
+        db.read("users",(data) => {
+          var expectedResult = users.concat(users2add);
+          expect(data).to.eql(expectedResult);
+          done();
+        })
+      });
+    });
+  });
+
+  it('should remove one User in Users', (done) => {
+    db.write("users",users, () => {
+      var user2remove = { id: 0, name: "Juan" };
+      db.remove("users",user2remove,() => {
+        db.read("users",(data) => {
+          var expectedResult = users.filter((item) => { return (![user2remove].indexOf(item) > -1 ) } );
+          expect(data).to.eql(expectedResult);
+          done();
+        })
+      });
+    });
+  });
+
+  it('should remove more than one User in Users', (done) => {
+    db.write("users",users, () => {
+      var users2remove = [{ id: 0, name: "Juan" }, { id: 1, name: "Matias" }];
+      db.remove("users",users2remove,() => {
+        db.read("users",(data) => {
+          var expectedResult = users.filter((item) => { return (!users2remove.indexOf(item) > -1 ) } );
+          expect(data).to.eql(expectedResult);
+          done();
+        })
+      });
+    });
+  });
+
+  it('should update Users filterd in DB', (done) => {
+    db.write("users",users, () => {
+      db.update("users",{ id: 0 },{ name: "Juan Martin" },() => {
+        db.read("users",(data) => {
+          var expectedResult = { id: 0, name: 'Juan Martin' }
+          expect(data[0]).to.eql(expectedResult);
+          done();
+        });
+      });
+    });
+  });
+
 });
