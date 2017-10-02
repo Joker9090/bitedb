@@ -1,6 +1,6 @@
 var fs = require('fs');
-var jv = new require('json-validation');
-jv = new jv.JSONValidation();
+var jv = require('jsonschema').Validator;
+jv = new jv();
 
 var bitedb = function(){
   this.dbLocation;
@@ -30,7 +30,7 @@ var bitedb = function(){
         if (err) throw err;
         data = (data.length > 0) ? JSON.parse(data) : data
         var result = jv.validate(data,{ "type": "object" });
-        if (!result.ok) console.log("JSON has the following errors: " + result.errors.join(", "));
+        if (result.errors.length > 0) console.log("JSON has the following errors: " + result.errors.join(", "));
         fn( (data[tableObject] != undefined) ? data[tableObject] : "empty" );
       });
     });
@@ -47,8 +47,8 @@ var bitedb = function(){
   }
   this.checkObject = (obj,schema) => {
     var result = jv.validate(obj,schema);
-    if (!result.ok) console.log("JSON has the following errors: " + result.errors.join(", "));
-    return result.ok;
+    if (result.errors.length > 0) console.log("JSON has the following errors: " + result.errors.join(", "));
+    return true;
   }
   this.compare = (objA,objB) => {
     return (objA == objB);
