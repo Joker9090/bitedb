@@ -35,6 +35,16 @@ var bitedb = function(){
       });
     });
   }
+  this.readAll = (fn) => {
+    var direction = this.dbLocation+"/db/"+this.db+".json";
+    fs.readFile(direction, 'utf8', function (err, data) {
+      if (err) throw err;
+      data = (data.length > 0) ? JSON.parse(data) : data
+      var result = jv.validate(data,{ "type": "object" });
+      if (result.errors.length > 0) console.log("JSON has the following errors: " + result.errors.join(", "));
+      fn( (data != undefined) ? data : {} );
+    })
+  }
   this.write = (tableObject,items,fn) => {
     var direction = this.dbLocation+"/db/"+this.db+".json";
     this.read(tableObject,(data) => {
@@ -42,8 +52,15 @@ var bitedb = function(){
       o[tableObject] = Array();
       items = (items.constructor !== Array) ? [items] : items;
       items.map((i) => { o[tableObject].push(i) });
-      fs.writeFile(direction,JSON.stringify(o),fn);
+      this.replaceInFile(tableObject,o,fn);
     });
+  }
+  this.replaceInFile = (tableObject,newValue,fn) => {
+    var direction = this.dbLocation+"/db/"+this.db+".json";
+    this.readAll((allData) => {
+      var allNew = Object.assign({}, allData, newValue);
+      fs.writeFile(direction,JSON.stringify(allNew, null, 2),fn);
+    })
   }
   this.checkObject = (obj,schema) => {
     var result = jv.validate(obj,schema);
